@@ -1,7 +1,8 @@
+// ìºë‹ˆ ì—ì§€ ì§„í–‰ í›„ ì‚¬ìš©í•´ì•¼ë¨
 #include <opencv2/opencv.hpp>
 #include <cmath>
 #include <vector>
-// ºñÃÖ´ë ¾ïÁ¦¸¦ Àû¿ëÇÑ ÇãÇÁ º¯È¯ ÇÔ¼ö
+// ë¹„ìµœëŒ€ ì–µì œë¥¼ ì ìš©í•œ í—ˆí”„ ë³€í™˜ í•¨ìˆ˜
 void HoughTransform(const cv::Mat& edges, std::vector<cv::Vec2f>& lines, int rho_resolution, double theta_resolution, int threshold, int nms_distance) {
     int width = edges.cols;
     int height = edges.rows;
@@ -56,21 +57,21 @@ void HoughTransform(const cv::Mat& edges, std::vector<cv::Vec2f>& lines, int rho
     }
 }
 int main() {
-    // ÀÌ¹ÌÁö¸¦ ±×·¹ÀÌ½ºÄÉÀÏ·Î ºÒ·¯¿À±â
-    cv::Mat image = cv::imread("./canyy edge/hurf/hysteresis_thresholded.jpg", cv::IMREAD_GRAYSCALE); // Ä³´Ï ¿¡Áö ÈÄ °ËÃâµÈ ÀÌ¹ÌÁö »ç¿ë
+    // ì´ë¯¸ì§€ë¥¼ ê·¸ë ˆì´ìŠ¤ì¼€ì¼ë¡œ ë¶ˆëŸ¬ì˜¤ê¸°
+    cv::Mat image = cv::imread("./canyy edge/hurf/hysteresis_thresholded.jpg", cv::IMREAD_GRAYSCALE); // ìºë‹ˆ ì—ì§€ í›„ ê²€ì¶œëœ ì´ë¯¸ì§€ ì‚¬ìš©
     if (image.empty()) {
-        std::cout << "ÀÌ¹ÌÁö¸¦ ºÒ·¯¿À´Â µ¥ ½ÇÆĞÇß½À´Ï´Ù." << std::endl;
+        std::cout << "ì´ë¯¸ì§€ë¥¼ ë¶ˆëŸ¬ì˜¤ëŠ” ë° ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤." << std::endl;
         return -1;
     }
 
-    int width = image.cols; // ÀÌ¹ÌÁö ³Êºñ
-    int height = image.rows; // ÀÌ¹ÌÁö ³ôÀÌ
+    int width = image.cols; // ì´ë¯¸ì§€ ë„ˆë¹„
+    int height = image.rows; // ì´ë¯¸ì§€ ë†’ì´
 
-    // »ç¿ëÀÚ Á¤ÀÇ ÇãÇÁ º¯È¯ Àû¿ë
+    // ì‚¬ìš©ì ì •ì˜ í—ˆí”„ ë³€í™˜ ì ìš©
     std::vector<cv::Vec2f> lines;
-    HoughTransform(image, lines, 1, 1, 250, 10); // rho ÇØ»óµµ, theta ÇØ»óµµ, ÀÓ°è°ª Á¶Á¤
+    HoughTransform(image, lines, 1, 1, 250, 10); // rho í•´ìƒë„, theta í•´ìƒë„, ì„ê³„ê°’ ì¡°ì •
 
-    // °ËÃâµÈ Á÷¼±À» ÀÌ¹ÌÁö¿¡ ±×¸®±â
+    // ê²€ì¶œëœ ì§ì„ ì„ ì´ë¯¸ì§€ì— ê·¸ë¦¬ê¸°
     cv::Mat color_image;
     cv::cvtColor(image, color_image, cv::COLOR_GRAY2BGR);
     for (size_t i = 0; i < lines.size(); i++) {
@@ -78,19 +79,19 @@ int main() {
         double a = std::cos(theta), b = std::sin(theta);
         double x0 = a * rho, y0 = b * rho;
 
-        // ¼ö¼±ÀÇ ¹ßÀ» ³»·Á ¸¸³ª´Â ÁÂÇ¥ x, y °è»ê
+        // ìˆ˜ì„ ì˜ ë°œì„ ë‚´ë ¤ ë§Œë‚˜ëŠ” ì¢Œí‘œ x, y ê³„ì‚°
         int x = static_cast<int>(x0 + 1000 * (-b));
         int y = static_cast<int>(y0 + 1000 * (a));
 
-        // ÃæºĞÈ÷ ¸Ö¸® ¶³¾îÁ® ÀÖ´Â µÎ Á¡ °è»ê
+        // ì¶©ë¶„íˆ ë©€ë¦¬ ë–¨ì–´ì ¸ ìˆëŠ” ë‘ ì  ê³„ì‚°
         cv::Point pt1(x + 2000 * (-b), y + 2000 * (a));
         cv::Point pt2(x - 2000 * (-b), y - 2000 * (a));
 
-        // »¡°£»ö ½Ç¼±À¸·Î ¼±ºĞ ±×¸®±â
+        // ë¹¨ê°„ìƒ‰ ì‹¤ì„ ìœ¼ë¡œ ì„ ë¶„ ê·¸ë¦¬ê¸°
         cv::line(color_image, pt1, pt2, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
     }
 
-    // °á°ú ÀÌ¹ÌÁö ÀúÀå
+    // ê²°ê³¼ ì´ë¯¸ì§€ ì €ì¥
     cv::imwrite("./canyy edge/hurf/hough_transform_custom_result.jpg", color_image);
 
     return 0;
